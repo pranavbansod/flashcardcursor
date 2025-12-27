@@ -1,0 +1,87 @@
+---
+alwaysApply: true
+description: Database interaction guidelines using Drizzle ORM
+---
+
+# Database Interaction Rules
+
+All database interactions in this project **must** use Drizzle ORM with the schema and queries defined in [src/db/schema.ts](mdc:src/db/schema.ts).
+
+## Schema Overview
+
+The database schema is defined using Drizzle ORM with PostgreSQL:
+
+- **decksTable**: Stores user flashcard decks with fields: id, userId, name, description, createdAt, updatedAt
+- **cardsTable**: Stores individual flashcards with fields: id, deckId, front, back, createdAt, updatedAt
+
+## Requirements
+
+1. **Import schema from the correct location**:
+   ```typescript
+   import { decksTable, cardsTable } from "@/db/schema";
+   ```
+
+2. **Use Drizzle queries** for all database operations:
+   - Use `db.select()`, `db.insert()`, `db.update()`, `db.delete()` methods
+   - Use Drizzle's query builder syntax, not raw SQL
+   - Leverage type-safe queries with proper TypeScript inference
+
+3. **Respect foreign key relationships**:
+   - Cards reference decks through `deckId`
+   - Cascade delete is configured (deleting a deck deletes its cards)
+
+4. **Use proper filters**:
+   - Always filter by `userId` when querying decks to ensure user data isolation
+   - Use Drizzle's `eq()`, `and()`, `or()` operators for conditions
+
+5. **Handle timestamps properly**:
+   - `createdAt` is auto-generated on insert
+   - Update `updatedAt` explicitly when modifying records
+
+## Example Patterns
+
+### Query decks for a user:
+```typescript
+import { db } from "@/db";
+import { decksTable } from "@/db/schema";
+import { eq } from "drizzle-orm";
+
+const userDecks = await db
+  .select()
+  .from(decksTable)
+  .where(eq(decksTable.userId, userId));
+```
+
+### Query cards in a deck:
+```typescript
+import { db } from "@/db";
+import { cardsTable } from "@/db/schema";
+import { eq } from "drizzle-orm";
+
+const cards = await db
+  .select()
+  .from(cardsTable)
+  .where(eq(cardsTable.deckId, deckId));
+```
+
+### Insert a new deck:
+```typescript
+import { db } from "@/db";
+import { decksTable } from "@/db/schema";
+
+const [newDeck] = await db
+  .insert(decksTable)
+  .values({
+    userId,
+    name: "My Deck",
+    description: "Description",
+  })
+  .returning();
+```
+
+## Never
+
+- ❌ Write raw SQL queries directly
+- ❌ Use string concatenation for queries
+- ❌ Skip userId filtering for user-specific data
+- ❌ Bypass the schema types
