@@ -1,7 +1,6 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
-
 # Clerk Authentication & Authorization Rules
 
 This project uses **Clerk** for authentication and authorization. All user data must be isolated to prevent unauthorized access.
@@ -267,7 +266,7 @@ export default async function DecksPage() {
   const user = await currentUser();
   
   if (!user) {
-    redirect("/sign-in");
+    redirect("/");
   }
   
   const decks = await db
