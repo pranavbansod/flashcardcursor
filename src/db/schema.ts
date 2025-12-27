@@ -16,6 +16,10 @@ export const cardsTable = pgTable("cards", {
   deckId: integer().notNull().references(() => decksTable.id, { onDelete: "cascade" }),
   front: text().notNull(), // Question/prompt (e.g., "日" or "When was the Battle of Hastings?")
   back: text().notNull(), // Answer (e.g., "day, sun" or "1066")
+  // Study tracking fields
+  studiedCount: integer().default(0).notNull(), // Number of times successfully studied
+  lastStudied: timestamp(), // When the card was last studied (null if never studied)
+  masteryLevel: integer().default(0).notNull(), // 0 = not studied, 1-5 = increasing mastery
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp().defaultNow().notNull(),
 });

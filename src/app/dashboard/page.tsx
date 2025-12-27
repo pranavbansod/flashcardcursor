@@ -45,7 +45,7 @@ export default async function DashboardPage() {
               {decks.map((deck) => (
                 <Link
                   key={deck.id}
-                  href={`/dashboard/decks/${deck.id}`}
+                  href={`/decks/${deck.id}`}
                   className="block p-4 rounded-lg border bg-card hover:bg-accent transition-colors"
                 >
                   <h3 className="font-semibold text-lg mb-2">{deck.name}</h3>
@@ -55,7 +55,7 @@ export default async function DashboardPage() {
                     </p>
                   )}
                   <p className="text-xs text-muted-foreground mt-3">
-                    Created {new Date(deck.createdAt).toLocaleDateString()}
+                    Last Updated {new Date(deck.updatedAt).toLocaleDateString()}
                   </p>
                 </Link>
               ))}

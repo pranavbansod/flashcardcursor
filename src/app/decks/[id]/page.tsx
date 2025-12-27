@@ -1,0 +1,179 @@
+import { currentUser } from "@clerk/nextjs/server";
+import { redirect, notFound } from "next/navigation";
+import { getDeckById } from "@/db/queries/decks";
+import { getCardsByDeckId } from "@/db/queries/cards";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
+import { Settings, Pencil, BookOpen } from "lucide-react";
+
+interface DeckPageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
+export default async function DeckPage({ params }: DeckPageProps) {
+  const user = await currentUser();
+
+  if (!user) {
+    redirect("/");
+  }
+
+  const { id } = await params;
+  const deckId = parseInt(id, 10);
+
+  if (isNaN(deckId)) {
+    notFound();
+  }
+
+  // Fetch deck with ownership verification
+  const deck = await getDeckById(deckId, user.id);
+
+  if (!deck) {
+    notFound();
+  }
+
+  // Fetch cards for this deck
+  const cards = await getCardsByDeckId(deckId);
+
+  // Calculate study progress based on cards that have been studied (masteryLevel > 0)
+  const studiedCardsCount = cards.filter(card => card.masteryLevel > 0).length;
+  const progressPercentage = cards.length > 0 ? (studiedCardsCount / cards.length) * 100 : 0;
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Back button */}
+      <Button asChild variant="ghost" className="mb-6">
+        <Link href="/dashboard">← Back to Dashboard</Link>
+      </Button>
+
+      {/* Deck Details Header Card */}
+      <Card className="mb-8">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold">{deck.name}</h1>
+                <Badge variant="secondary" className="text-base px-3 py-1">
+                  {cards.length} {cards.length === 1 ? "card" : "cards"}
+                </Badge>
+              </div>
+              {deck.description && (
+                <p className="text-muted-foreground text-lg mt-2">{deck.description}</p>
+              )}
+              <p className="text-sm text-muted-foreground mt-3">
+                Created {new Date(deck.createdAt).toLocaleDateString()} • Last updated {new Date(deck.updatedAt).toLocaleDateString()}
+              </p>
+            </div>
+
+            <div className="flex gap-2">
+              <Button asChild variant="outline" size="icon" title="Edit Deck">
+                <Link href={`/decks/${deck.id}/edit`}>
+                  <Pencil className="h-4 w-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="icon" title="Deck Settings">
+                <Link href={`/decks/${deck.id}/settings`}>
+                  <Settings className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+
+        <Separator />
+
+        <CardContent className="pt-6">
+          {/* Progress Section */}
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium">Study Progress</span>
+              <span className="text-sm text-muted-foreground">
+                {Math.round(progressPercentage)}% Mastered
+              </span>
+            </div>
+            <Progress value={progressPercentage} className="h-2" />
+            <p className="text-xs text-muted-foreground mt-2">
+              {cards.length === 0 
+                ? "Add cards to start building your deck"
+                : studiedCardsCount === 0 
+                  ? "Start a study session to track your progress"
+                  : studiedCardsCount === cards.length
+                    ? "Excellent! You've studied all cards in this deck"
+                    : `${studiedCardsCount} of ${cards.length} cards studied`}
+            </p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3">
+            <Button asChild size="lg" className="flex-1" disabled={cards.length === 0}>
+              <Link href={`/decks/${deck.id}/study`}>
+                <BookOpen className="mr-2 h-5 w-5" />
+                Start Study Session
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link href={`/decks/${deck.id}/cards/new`}>Add Card</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Flashcards</CardTitle>
+            <CardDescription>
+              {cards.length === 0
+                ? "No flashcards yet. Add your first card to get started!"
+                : `${cards.length} flashcard${cards.length === 1 ? "" : "s"} in this deck`}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {cards.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground mb-4">
+                  This deck doesn't have any flashcards yet.
+                </p>
+                <Button asChild>
+                  <Link href={`/decks/${deck.id}/cards/new`}>Add Your First Card</Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2">
+                {cards.map((card) => (
+                  <Card key={card.id} className="hover:bg-accent/50 transition-colors">
+                    <CardHeader>
+                      <CardTitle className="text-base">Front</CardTitle>
+                      <CardDescription className="text-base text-foreground">
+                        {card.front}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="border-t pt-4">
+                        <p className="text-sm font-semibold mb-1">Back</p>
+                        <p className="text-sm text-muted-foreground">{card.back}</p>
+                      </div>
+                      <div className="flex justify-end gap-2 mt-4">
+                        <Button asChild variant="ghost" size="sm">
+                          <Link href={`/decks/${deck.id}/cards/${card.id}/edit`}>
+                            Edit
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
