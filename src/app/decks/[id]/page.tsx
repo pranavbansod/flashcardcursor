@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { AddCardModal } from "@/components/add-card-modal";
 import Link from "next/link";
 import { Settings, Pencil, BookOpen } from "lucide-react";
 
@@ -71,14 +72,16 @@ export default async function DeckPage({ params }: DeckPageProps) {
             </div>
 
             <div className="flex gap-2">
-              <Button asChild variant="outline" size="icon" title="Edit Deck">
+              <Button asChild variant="outline" size="sm">
                 <Link href={`/decks/${deck.id}/edit`}>
-                  <Pencil className="h-4 w-4" />
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Edit
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="icon" title="Deck Settings">
+              <Button asChild variant="outline" size="sm">
                 <Link href={`/decks/${deck.id}/settings`}>
-                  <Settings className="h-4 w-4" />
+                  <Settings className="h-4 w-4 mr-2" />
+                  Settings
                 </Link>
               </Button>
             </div>
@@ -116,9 +119,7 @@ export default async function DeckPage({ params }: DeckPageProps) {
                 Start Study Session
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href={`/decks/${deck.id}/cards/new`}>Add Card</Link>
-            </Button>
+            <AddCardModal deckId={deck.id} variant="outline" size="lg" />
           </div>
         </CardContent>
       </Card>
@@ -139,9 +140,9 @@ export default async function DeckPage({ params }: DeckPageProps) {
                 <p className="text-muted-foreground mb-4">
                   This deck doesn't have any flashcards yet.
                 </p>
-                <Button asChild>
-                  <Link href={`/decks/${deck.id}/cards/new`}>Add Your First Card</Link>
-                </Button>
+                <AddCardModal deckId={deck.id}>
+                  <Button>Add Your First Card</Button>
+                </AddCardModal>
               </div>
             ) : (
               <div className="grid gap-4 md:grid-cols-2">
