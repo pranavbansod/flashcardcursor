@@ -1,8 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { db } from "@/db";
-import { decksTable } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { getDecksByUserId } from "@/db/queries/decks";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -13,11 +11,8 @@ export default async function DashboardPage() {
     redirect("/");
   }
 
-  // Fetch user's decks
-  const decks = await db
-    .select()
-    .from(decksTable)
-    .where(eq(decksTable.userId, user.id));
+  // Fetch user's decks using query helper
+  const decks = await getDecksByUserId(user.id);
 
   return (
     <div className="container mx-auto px-4 py-8">
