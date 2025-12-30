@@ -4,10 +4,8 @@ import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export default async function Home() {
-  // Check if user is logged in
   const user = await currentUser();
   
-  // Redirect to dashboard if user is authenticated
   if (user) {
     redirect("/dashboard");
   }

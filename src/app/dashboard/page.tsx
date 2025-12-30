@@ -11,7 +11,6 @@ export default async function DashboardPage() {
     redirect("/");
   }
 
-  // Fetch user's decks using query helper
   const decks = await getDecksByUserId(user.id);
 
   return (

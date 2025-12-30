@@ -2,9 +2,6 @@ import { db } from "@/db";
 import { decksTable } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
-/**
- * Get all decks for a specific user
- */
 export async function getDecksByUserId(userId: string) {
   return await db
     .select()
@@ -12,9 +9,6 @@ export async function getDecksByUserId(userId: string) {
     .where(eq(decksTable.userId, userId));
 }
 
-/**
- * Get a single deck by ID and user ID (ensures ownership)
- */
 export async function getDeckById(deckId: number, userId: string) {
   const [deck] = await db
     .select()
@@ -27,9 +21,6 @@ export async function getDeckById(deckId: number, userId: string) {
   return deck;
 }
 
-/**
- * Insert a new deck
- */
 export async function insertDeck(data: {
   userId: string;
   name: string;
@@ -43,9 +34,6 @@ export async function insertDeck(data: {
   return newDeck;
 }
 
-/**
- * Update a deck by ID (ensures ownership)
- */
 export async function updateDeckById(
   deckId: number,
   userId: string,
@@ -69,9 +57,6 @@ export async function updateDeckById(
   return updatedDeck;
 }
 
-/**
- * Delete a deck by ID (ensures ownership)
- */
 export async function deleteDeckById(deckId: number, userId: string) {
   await db
     .delete(decksTable)

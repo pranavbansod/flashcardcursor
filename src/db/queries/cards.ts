@@ -2,9 +2,6 @@ import { db } from "@/db";
 import { cardsTable } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
-/**
- * Get all cards for a specific deck
- */
 export async function getCardsByDeckId(deckId: number) {
   return await db
     .select()
@@ -12,9 +9,6 @@ export async function getCardsByDeckId(deckId: number) {
     .where(eq(cardsTable.deckId, deckId));
 }
 
-/**
- * Get a single card by ID
- */
 export async function getCardById(cardId: number) {
   const [card] = await db
     .select()
@@ -24,9 +18,6 @@ export async function getCardById(cardId: number) {
   return card;
 }
 
-/**
- * Insert a new card
- */
 export async function insertCard(data: {
   deckId: number;
   front: string;
@@ -40,9 +31,6 @@ export async function insertCard(data: {
   return newCard;
 }
 
-/**
- * Update a card by ID
- */
 export async function updateCardById(
   cardId: number,
   data: {
@@ -62,18 +50,12 @@ export async function updateCardById(
   return updatedCard;
 }
 
-/**
- * Delete a card by ID
- */
 export async function deleteCardById(cardId: number) {
   await db
     .delete(cardsTable)
     .where(eq(cardsTable.id, cardId));
 }
 
-/**
- * Delete all cards in a deck
- */
 export async function deleteCardsByDeckId(deckId: number) {
   await db
     .delete(cardsTable)

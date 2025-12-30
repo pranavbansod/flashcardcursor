@@ -45,12 +45,10 @@ export function AddCardModal({ deckId, variant = "outline", size = "lg", classNa
       });
 
       if (result.success) {
-        // Reset form and close modal
         setFront("");
         setBack("");
         setOpen(false);
       } else {
-        // Handle validation errors
         if (result.error && "_errors" in result.error) {
           setError(result.error._errors[0] || "Failed to create card");
         } else if (result.error) {

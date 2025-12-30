@@ -31,28 +31,23 @@ export default async function DeckPage({ params }: DeckPageProps) {
     notFound();
   }
 
-  // Fetch deck with ownership verification
   const deck = await getDeckById(deckId, user.id);
 
   if (!deck) {
     notFound();
   }
 
-  // Fetch cards for this deck
   const cards = await getCardsByDeckId(deckId);
 
-  // Calculate study progress based on cards that have been studied (masteryLevel > 0)
   const studiedCardsCount = cards.filter(card => card.masteryLevel > 0).length;
   const progressPercentage = cards.length > 0 ? (studiedCardsCount / cards.length) * 100 : 0;
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Back button */}
       <Button asChild variant="ghost" className="mb-6">
         <Link href="/dashboard">← Back to Dashboard</Link>
       </Button>
 
-      {/* Deck Details Header Card */}
       <Card className="mb-8">
         <CardHeader>
           <div className="flex justify-between items-start">
@@ -91,7 +86,6 @@ export default async function DeckPage({ params }: DeckPageProps) {
         <Separator />
 
         <CardContent className="pt-6">
-          {/* Progress Section */}
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium">Study Progress</span>
@@ -111,7 +105,6 @@ export default async function DeckPage({ params }: DeckPageProps) {
             </p>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex gap-3">
             <Button asChild size="lg" className="flex-1" disabled={cards.length === 0}>
               <Link href={`/decks/${deck.id}/study`}>

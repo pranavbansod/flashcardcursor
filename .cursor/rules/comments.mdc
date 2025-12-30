@@ -1,0 +1,50 @@
+---
+alwaysApply: true
+---
+# Code Comments Guidelines
+
+## Core Principles
+
+1. **Avoid unnecessary comments** - Code should be self-documenting through clear naming and structure
+2. **Only comment complex logic** - Add comments only when the code's intent is not immediately obvious
+3. **Remove redundant comments** - If the code is readable, comments are not needed
+4. **Prefer clear code over comments** - Refactor code to be more readable rather than adding explanatory comments
+
+## When to Add Comments
+
+- Complex algorithms or business logic that isn't self-evident
+- Workarounds for known issues or limitations
+- Non-obvious performance optimizations
+- Complex type transformations or data manipulations
+
+## When NOT to Add Comments
+
+- Simple variable declarations
+- Obvious function names and parameters
+- Standard patterns and conventions
+- Self-explanatory code blocks
+- Type definitions that are clear from context
+
+## Examples
+
+### ❌ Bad - Unnecessary Comment
+```typescript
+// Get the user ID
+const userId = user.id;
+
+// Return the decks
+return decks;
+```
+
+### ✅ Good - No Comment Needed
+```typescript
+const userId = user.id;
+return decks;
+```
+
+### ✅ Good - Complex Logic Comment
+```typescript
+// Transform nested structure to flat array, preserving order
+// while handling circular references
+const flattened = transformNestedData(data, visited);
+```
