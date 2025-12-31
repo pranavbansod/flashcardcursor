@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { studyCard } from "@/actions/card-actions";
 import Link from "next/link";
-import { RotateCcw, ChevronLeft, ChevronRight, X, Check } from "lucide-react";
+import { RotateCcw, ChevronLeft, ChevronRight, X, Check, Shuffle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface StudySessionProps {
@@ -26,20 +26,30 @@ interface StudySessionProps {
 }
 
 export function StudySession({ deck, cards }: StudySessionProps) {
+  const [shuffledCards, setShuffledCards] = useState(() => {
+    return [...cards].sort(() => Math.random() - 0.5);
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  const currentCard = cards[currentIndex];
-  const progress = ((currentIndex + 1) / cards.length) * 100;
+  const currentCard = shuffledCards[currentIndex];
+  const progress = ((currentIndex + 1) / shuffledCards.length) * 100;
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
   };
 
+  const handleShuffle = () => {
+    const newShuffled = [...shuffledCards].sort(() => Math.random() - 0.5);
+    setShuffledCards(newShuffled);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+  };
+
   const handleNext = () => {
-    if (currentIndex < cards.length - 1) {
+    if (currentIndex < shuffledCards.length - 1) {
       setCurrentIndex(currentIndex + 1);
       setIsFlipped(false);
     }
@@ -87,9 +97,20 @@ export function StudySession({ deck, cards }: StudySessionProps) {
             Exit Study
           </Link>
         </Button>
-        <Badge variant="secondary" className="text-base px-3 py-1">
-          {currentIndex + 1} / {cards.length}
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={handleShuffle}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            <Shuffle className="h-4 w-4" />
+            Shuffle
+          </Button>
+          <Badge variant="secondary" className="text-base px-3 py-1">
+            {currentIndex + 1} / {shuffledCards.length}
+          </Badge>
+        </div>
       </div>
 
       <div className="mb-6">
@@ -188,7 +209,7 @@ export function StudySession({ deck, cards }: StudySessionProps) {
           Previous
         </Button>
 
-        {currentIndex === cards.length - 1 && isFlipped && (
+        {currentIndex === shuffledCards.length - 1 && isFlipped && (
           <Button onClick={handleFinish} variant="default">
             Finish Study Session
           </Button>
@@ -197,7 +218,7 @@ export function StudySession({ deck, cards }: StudySessionProps) {
         <Button
           onClick={handleNext}
           variant="outline"
-          disabled={currentIndex === cards.length - 1}
+          disabled={currentIndex === shuffledCards.length - 1}
         >
           Next
           <ChevronRight className="ml-2 h-4 w-4" />
