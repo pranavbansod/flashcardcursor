@@ -1,12 +1,13 @@
 import { db } from "@/db";
-import { cardsTable } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { cardsTable, decksTable } from "@/db/schema";
+import { eq, and, desc } from "drizzle-orm";
 
 export async function getCardsByDeckId(deckId: number) {
   return await db
     .select()
     .from(cardsTable)
-    .where(eq(cardsTable.deckId, deckId));
+    .where(eq(cardsTable.deckId, deckId))
+    .orderBy(desc(cardsTable.updatedAt));
 }
 
 export async function getCardById(cardId: number) {
@@ -16,6 +17,22 @@ export async function getCardById(cardId: number) {
     .where(eq(cardsTable.id, cardId));
   
   return card;
+}
+
+export async function getCardByIdWithDeck(cardId: number, userId: string) {
+  const [result] = await db
+    .select({
+      card: cardsTable,
+      deck: decksTable,
+    })
+    .from(cardsTable)
+    .innerJoin(decksTable, eq(cardsTable.deckId, decksTable.id))
+    .where(and(
+      eq(cardsTable.id, cardId),
+      eq(decksTable.userId, userId)
+    ));
+  
+  return result?.card || null;
 }
 
 export async function insertCard(data: {
