@@ -42,7 +42,11 @@ export async function insertCard(data: {
 }) {
   const [newCard] = await db
     .insert(cardsTable)
-    .values(data)
+    .values({
+      deckId: data.deckId,
+      front: data.front,
+      back: data.back,
+    })
     .returning();
   
   return newCard;

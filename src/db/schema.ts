@@ -1,7 +1,7 @@
 import { integer, pgTable, varchar, text, timestamp } from "drizzle-orm/pg-core";
 
 export const decksTable = pgTable("decks", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
   userId: varchar({ length: 255 }).notNull(),
   name: varchar({ length: 255 }).notNull(),
   description: text(),
@@ -10,7 +10,7 @@ export const decksTable = pgTable("decks", {
 });
 
 export const cardsTable = pgTable("cards", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
   deckId: integer().notNull().references(() => decksTable.id, { onDelete: "cascade" }),
   front: text().notNull(),
   back: text().notNull(),

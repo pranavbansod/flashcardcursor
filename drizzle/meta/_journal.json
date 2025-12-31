@@ -8,6 +8,13 @@
       "when": 1766849184696,
       "tag": "0000_cold_deathstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1767182542926,
+      "tag": "0001_oval_lionheart",
+      "breakpoints": true
     }
   ]
 }

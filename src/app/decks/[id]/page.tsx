@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { AddCardModal } from "@/components/add-card-modal";
 import { EditDeckModal } from "@/components/edit-deck-modal";
 import { DeleteCardButton } from "@/components/delete-card-button";
+import { DeleteDeckButton } from "@/components/delete-deck-button";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 
@@ -64,13 +65,20 @@ export default async function DeckPage({ params }: DeckPageProps) {
               </p>
             </div>
 
-            <EditDeckModal
-              deckId={deck.id}
-              currentName={deck.name}
-              currentDescription={deck.description}
-              variant="outline"
-              size="sm"
-            />
+            <div className="flex gap-2">
+              <EditDeckModal
+                deckId={deck.id}
+                currentName={deck.name}
+                currentDescription={deck.description}
+                variant="outline"
+                size="sm"
+              />
+              <DeleteDeckButton
+                deckId={deck.id}
+                deckName={deck.name}
+                cardCount={cards.length}
+              />
+            </div>
           </div>
         </CardHeader>
 
