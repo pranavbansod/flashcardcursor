@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { studyCard } from "@/actions/card-actions";
 import Link from "next/link";
-import { RotateCcw, ChevronLeft, ChevronRight, X, Check, Shuffle } from "lucide-react";
+import { RotateCcw, ChevronLeft, ChevronRight, X, Check, Shuffle, Keyboard } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface StudySessionProps {
@@ -26,20 +26,23 @@ interface StudySessionProps {
 }
 
 export function StudySession({ deck, cards }: StudySessionProps) {
-  const [shuffledCards, setShuffledCards] = useState(() => {
-    return [...cards].sort(() => Math.random() - 0.5);
-  });
+  const [shuffledCards, setShuffledCards] = useState(cards);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    const shuffled = [...cards].sort(() => Math.random() - 0.5);
+    setShuffledCards(shuffled);
+  }, [cards]);
+
   const currentCard = shuffledCards[currentIndex];
   const progress = ((currentIndex + 1) / shuffledCards.length) * 100;
 
-  const handleFlip = () => {
-    setIsFlipped(!isFlipped);
-  };
+  const handleFlip = useCallback(() => {
+    setIsFlipped((prev) => !prev);
+  }, []);
 
   const handleShuffle = () => {
     const newShuffled = [...shuffledCards].sort(() => Math.random() - 0.5);
@@ -48,19 +51,25 @@ export function StudySession({ deck, cards }: StudySessionProps) {
     setIsFlipped(false);
   };
 
-  const handleNext = () => {
-    if (currentIndex < shuffledCards.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setIsFlipped(false);
-    }
-  };
+  const handleNext = useCallback(() => {
+    setCurrentIndex((prevIndex) => {
+      if (prevIndex < shuffledCards.length - 1) {
+        return prevIndex + 1;
+      }
+      return prevIndex;
+    });
+    setIsFlipped(false);
+  }, [shuffledCards.length]);
 
-  const handlePrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      setIsFlipped(false);
-    }
-  };
+  const handlePrevious = useCallback(() => {
+    setCurrentIndex((prevIndex) => {
+      if (prevIndex > 0) {
+        return prevIndex - 1;
+      }
+      return prevIndex;
+    });
+    setIsFlipped(false);
+  }, []);
 
   const handleStudyResult = async (masteryLevel: number) => {
     if (isSubmitting) return;
@@ -72,7 +81,7 @@ export function StudySession({ deck, cards }: StudySessionProps) {
         masteryLevel,
       });
 
-      if (currentIndex < cards.length - 1) {
+      if (currentIndex < shuffledCards.length - 1) {
         handleNext();
       } else {
         router.push(`/decks/${deck.id}`);
@@ -87,6 +96,38 @@ export function StudySession({ deck, cards }: StudySessionProps) {
   const handleFinish = () => {
     router.push(`/decks/${deck.id}`);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (isSubmitting) return;
+
+      const target = event.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+        return;
+      }
+
+      switch (event.key) {
+        case "ArrowLeft":
+          event.preventDefault();
+          handlePrevious();
+          break;
+        case "ArrowRight":
+          event.preventDefault();
+          handleNext();
+          break;
+        case " ":
+          event.preventDefault();
+          handleFlip();
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isSubmitting, handlePrevious, handleNext, handleFlip]);
 
   return (
     <div className="container mx-auto px-6 py-8 max-w-4xl">
@@ -121,6 +162,16 @@ export function StudySession({ deck, cards }: StudySessionProps) {
           </span>
         </div>
         <Progress value={progress} className="h-2" />
+        <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+          <Keyboard className="h-3 w-3" />
+          <span>
+            <kbd className="px-1.5 py-0.5 text-xs font-semibold bg-muted rounded border">←</kbd> Previous
+            {" • "}
+            <kbd className="px-1.5 py-0.5 text-xs font-semibold bg-muted rounded border">→</kbd> Next
+            {" • "}
+            <kbd className="px-1.5 py-0.5 text-xs font-semibold bg-muted rounded border">Space</kbd> Flip
+          </span>
+        </div>
       </div>
 
       <Card className="mb-6 min-h-[400px] flex flex-col">
