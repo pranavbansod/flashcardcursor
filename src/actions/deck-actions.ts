@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { auth } from "@clerk/nextjs/server";
-import { getDeckById, updateDeckById } from "@/db/queries/decks";
+import { getDeckById, updateDeckById, insertDeck } from "@/db/queries/decks";
 import { revalidatePath } from "next/cache";
 
 const updateDeckSchema = z.object({
@@ -55,5 +55,43 @@ export async function updateDeck(input: UpdateDeckInput) {
   revalidatePath("/dashboard");
   
   return { success: true, deck: updatedDeck };
+}
+
+const createDeckSchema = z.object({
+  name: z.string().min(1, "Name is required").max(100, "Name too long"),
+  description: z.string().max(500).optional(),
+});
+
+type CreateDeckInput = z.infer<typeof createDeckSchema>;
+
+export async function createDeck(input: CreateDeckInput) {
+  const result = createDeckSchema.safeParse(input);
+  
+  if (!result.success) {
+    return {
+      success: false,
+      error: result.error.format(),
+    };
+  }
+  
+  const validated = result.data;
+  
+  const { userId } = await auth();
+  if (!userId) {
+    return {
+      success: false,
+      error: { _errors: ["Unauthorized"] },
+    };
+  }
+  
+  const newDeck = await insertDeck({
+    userId,
+    name: validated.name,
+    description: validated.description,
+  });
+  
+  revalidatePath("/dashboard");
+  
+  return { success: true, deck: newDeck };
 }
 

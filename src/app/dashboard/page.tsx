@@ -1,7 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getDecksByUserId } from "@/db/queries/decks";
-import { Button } from "@/components/ui/button";
+import { CreateDeckModal } from "@/components/create-deck-modal";
 import Link from "next/link";
 
 export default async function DashboardPage() {
@@ -22,9 +22,7 @@ export default async function DashboardPage() {
             Welcome back, {user.firstName || user.emailAddresses[0]?.emailAddress}
           </p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard/decks/new">Create Deck</Link>
-        </Button>
+        <CreateDeckModal />
       </div>
 
       <div className="grid gap-6">
@@ -35,9 +33,7 @@ export default async function DashboardPage() {
               <p className="text-muted-foreground mb-4">
                 You haven't created any decks yet.
               </p>
-              <Button asChild>
-                <Link href="/dashboard/decks/new">Create Your First Deck</Link>
-              </Button>
+              <CreateDeckModal />
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
