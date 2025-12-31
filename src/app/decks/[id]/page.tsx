@@ -115,14 +115,14 @@ export default async function DeckPage({ params }: DeckPageProps) {
                   <Card key={card.id} className="hover:bg-accent/50 transition-colors">
                     <CardHeader>
                       <CardTitle className="text-base">Front</CardTitle>
-                      <CardDescription className="text-base text-foreground">
+                      <CardDescription className="text-base text-foreground bg-muted/50 px-3 py-2 rounded-md">
                         {card.front}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="border-t pt-4">
                         <p className="text-sm font-semibold mb-1">Back</p>
-                        <p className="text-sm text-muted-foreground">{card.back}</p>
+                        <p className="text-sm text-muted-foreground bg-accent/30 px-3 py-2 rounded-md">{card.back}</p>
                       </div>
                       <div className="flex justify-end gap-2 mt-4">
                         <Button asChild variant="ghost" size="sm">
