@@ -79,3 +79,23 @@ export async function deleteCardsByDeckId(deckId: number) {
     .where(eq(cardsTable.deckId, deckId));
 }
 
+export async function updateCardStudyProgress(
+  cardId: number,
+  data: {
+    studiedCount?: number;
+    lastStudied?: Date;
+    masteryLevel?: number;
+  }
+) {
+  const [updatedCard] = await db
+    .update(cardsTable)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(cardsTable.id, cardId))
+    .returning();
+  
+  return updatedCard;
+}
+

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AddCardModal } from "@/components/add-card-modal";
 import { EditDeckModal } from "@/components/edit-deck-modal";
+import { DeleteCardButton } from "@/components/delete-card-button";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 
@@ -40,7 +41,7 @@ export default async function DeckPage({ params }: DeckPageProps) {
   const cards = await getCardsByDeckId(deckId);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-6 py-8 max-w-7xl">
       <Button asChild variant="ghost" className="mb-6">
         <Link href="/dashboard">← Back to Dashboard</Link>
       </Button>
@@ -109,7 +110,7 @@ export default async function DeckPage({ params }: DeckPageProps) {
                 </AddCardModal>
               </div>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {cards.map((card) => (
                   <Card key={card.id} className="hover:bg-accent/50 transition-colors">
                     <CardHeader>
@@ -129,6 +130,7 @@ export default async function DeckPage({ params }: DeckPageProps) {
                             Edit
                           </Link>
                         </Button>
+                        <DeleteCardButton cardId={card.id} deckId={deck.id} />
                       </div>
                     </CardContent>
                   </Card>
