@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,11 +26,16 @@ interface AddCardModalProps {
 }
 
 export function AddCardModal({ deckId, variant = "outline", size = "lg", className, children }: AddCardModalProps) {
+  const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +71,19 @@ export function AddCardModal({ deckId, variant = "outline", size = "lg", classNa
       setIsLoading(false);
     }
   };
+
+  if (!mounted) {
+    return (
+      <>
+        {children || (
+          <Button variant={variant} size={size} className={className} disabled>
+            <Plus className="mr-2 h-5 w-5" />
+            Add Card
+          </Button>
+        )}
+      </>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
