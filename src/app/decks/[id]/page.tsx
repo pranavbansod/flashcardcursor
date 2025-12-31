@@ -8,8 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { AddCardModal } from "@/components/add-card-modal";
+import { EditDeckModal } from "@/components/edit-deck-modal";
 import Link from "next/link";
-import { Settings, Pencil, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 interface DeckPageProps {
   params: Promise<{
@@ -66,20 +67,13 @@ export default async function DeckPage({ params }: DeckPageProps) {
               </p>
             </div>
 
-            <div className="flex gap-2">
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/decks/${deck.id}/edit`}>
-                  <Pencil className="h-4 w-4 mr-2" />
-                  Edit
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/decks/${deck.id}/settings`}>
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
-                </Link>
-              </Button>
-            </div>
+            <EditDeckModal
+              deckId={deck.id}
+              currentName={deck.name}
+              currentDescription={deck.description}
+              variant="outline"
+              size="sm"
+            />
           </div>
         </CardHeader>
 
