@@ -5,7 +5,6 @@ import { getCardsByDeckId } from "@/db/queries/cards";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { AddCardModal } from "@/components/add-card-modal";
 import { EditDeckModal } from "@/components/edit-deck-modal";
@@ -39,9 +38,6 @@ export default async function DeckPage({ params }: DeckPageProps) {
   }
 
   const cards = await getCardsByDeckId(deckId);
-
-  const studiedCardsCount = cards.filter(card => card.masteryLevel > 0).length;
-  const progressPercentage = cards.length > 0 ? (studiedCardsCount / cards.length) * 100 : 0;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -80,25 +76,6 @@ export default async function DeckPage({ params }: DeckPageProps) {
         <Separator />
 
         <CardContent className="pt-6">
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium">Study Progress</span>
-              <span className="text-sm text-muted-foreground">
-                {Math.round(progressPercentage)}% Mastered
-              </span>
-            </div>
-            <Progress value={progressPercentage} className="h-2" />
-            <p className="text-xs text-muted-foreground mt-2">
-              {cards.length === 0 
-                ? "Add cards to start building your deck"
-                : studiedCardsCount === 0 
-                  ? "Start a study session to track your progress"
-                  : studiedCardsCount === cards.length
-                    ? "Excellent! You've studied all cards in this deck"
-                    : `${studiedCardsCount} of ${cards.length} cards studied`}
-            </p>
-          </div>
-
           <div className="flex gap-3">
             <Button asChild size="lg" className="flex-1" disabled={cards.length === 0}>
               <Link href={`/decks/${deck.id}/study`}>
